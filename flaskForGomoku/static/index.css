@@ -1,0 +1,14 @@
+canvas {
+    border: 1px solid #d3d3d3;
+    background-color: #f1cea6;
+} 
+.styleTopic {
+    color: rgba(153,153,255,1);
+    font-size: xx-large;
+    font-weight: bold;
+}
+
+ .styleText {
+    color: rgba(153, 153, 255, 1);
+    font-size: medium;
+}
