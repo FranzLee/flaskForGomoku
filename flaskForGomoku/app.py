@@ -17,9 +17,9 @@ def home():
     return render_template("index.html")
 
 @socketio.on('connect')
-def connect(data):
-    print("connect")
-    print("id : ", socketio.id)
+def connect():
+    print("connect!")
+    #allConnection.append(data.userId)
     # if(len(allConnection) == 1):
     #     emit("setting", "black")
     # else :
@@ -27,7 +27,7 @@ def connect(data):
 
 @socketio.on('message')
 def handle_message(data):
-    print('received message: ' + data)
+    print('received message: ', str(data))
 
 @socketio.on('newLoc')
 def newLoc(data):
@@ -39,7 +39,7 @@ def handle_json(json):
     print('received json: ' + str(json))
 
 if(__name__ == "__main__") :
-    socketio.run(app, allow_unsafe_werkzeug=True)
+    socketio.run(app, allow_unsafe_werkzeug=True, host="0.0.0.0", port=8080)
 
 def ack():
     print("message was received!")
