@@ -6,11 +6,14 @@
     <link rel="stylesheet" href="./../static/index.css"></link>
 </head>
 <body onload="startGame()">
+    <p>user name : </p><a id="userName" name="userName">{{ userName }}</a>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.0.1/socket.io.js" integrity="sha512-q/dWJ3kcmjBLU4Qc47E4A9kTB4m3wuTY7vkFJDTZKjTs8jhyGQnaUrxa0Ytd0ssMZhbNua9hE+E7Qv1j+DyZwA==" crossorigin="anonymous"></script>
 <script type="text/javascript" charset="utf-8">
-    var socket = io();
+    var myUrl = 'http://' + window.location.host;
+    var socket = io.connect(myUrl);
     socket.on('connect', () => {
-        socket.emit('message', {data: socket.id});
+        var userName = document.getElementById("userName").innerHTML;
+        socket.emit('message', {"userId": userName});
     });
     socket.on('setting', (data) => {
         playerSetting.color = data.color;
@@ -417,19 +420,19 @@ class text {
         this.y = 0;
     }
     update() {
-        if(playerSetting.status = "Your turn") {
+        if(playerSetting.status == "Your turn") {
             this.x = myGameArea.canvas.width - 185;
             this.y = myGameArea.canvas.height / 2;  
         }
-        else if(playerSetting.status = "Opponent's turn") {
+        else if(playerSetting.status == "Opponent's turn") {
             this.x = myGameArea.canvas.width - 200;
             this.y = myGameArea.canvas.height / 2;
         }
-        else if(playerSetting.status = "You won") {
+        else if(playerSetting.status == "You won") {
             this.x = myGameArea.canvas.width - 170;
             this.y = myGameArea.canvas.height / 2;
         }
-        else if(playerSetting.status = "You lose") {
+        else if(playerSetting.status == "You lose") {
             this.x = myGameArea.canvas.width - 175;
             this.y = myGameArea.canvas.height / 2;
         }
@@ -454,11 +457,6 @@ class block {
         ctx.strokeStyle = "white";
         ctx.strokeRect(this.x, this.y, this.width, this.height);
     }
-}
-
-function messageType(loc) {
-    this.status = "Your turn";
-    this.location = loc;
 }
 
 function endGame(color) {
@@ -492,7 +490,7 @@ function startGame() {
     }
     black.push(new blacks(1, 1));
     white.push(new whites(5, 7));
-    playerSetting.status = "Your turn";
+    playerSetting.status = "Your turn"; // 晚點刪掉
     textAndBlocks.push(new block(myGameArea.canvas.width - 225, myGameArea.canvas.height / 2 - 75, 200, 150));
     textAndBlocks.push(new text());
 }
