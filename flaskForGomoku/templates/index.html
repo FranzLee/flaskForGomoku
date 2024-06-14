@@ -14,12 +14,14 @@
     socket.on('connect', () => {
         var userName = document.getElementById("userName").innerHTML;
         socket.emit('message', {"userId": userName});
+        socket.emit('join', {"userId": userName});
     });
     socket.on('setting', (data) => {
         playerSetting.color = data.color;
         playerSetting.status = data.status;
     });
     socket.on('start', (data) => {
+        console.log("start");
         if(playerSetting.color == "black") {
             playerSetting.status = "Your turn";
         }
@@ -29,13 +31,13 @@
     });
     socket.on('newLoc', (data) => {
         playerSetting.status = data.status;
-        if(playerSetting.color = "white") {
+        if(playerSetting.color == "white") {
             black.push(new blacks(data.loc[0], data.loc[1]));
             if(black[black.length - 1].checkWin()) {
                 endGame("black");
             }
         }
-        else if(playerSetting.color = "black") {
+        else if(playerSetting.color == "black") {
             white.push(new whites(data.loc[0], data.loc[1]));
             if(white[white.length - 1].checkWin()) {
                 endGame("white");
@@ -139,7 +141,9 @@ function updateGameArea() {
 
     if(myGameArea.mouseDown && (playerSetting.status == "Your turn") && (gomokuBoard[myGameArea.mouseXPoint][myGameArea.mouseYPoint] == 0)) {
         myGameArea.mouseDown = false;
-        // playerSetting.status = "other";
+        var userName = document.getElementById("userName").innerHTML;
+        socket.emit('newLoc', {"loc" : [myGameArea.mouseXPoint, myGameArea.mouseYPoint], "status" : "Your turn", "userId" : userName});
+        playerSetting.status = "Opponent's turn";
         if(playerSetting.color == "white") {
             white.push(new whites(myGameArea.mouseXPoint, myGameArea.mouseYPoint));
             if(white[white.length - 1].checkWin()) {
@@ -152,8 +156,6 @@ function updateGameArea() {
                 endGame("black");
             }
         }
-        playerSetting.status = "Opponent's turn";
-        socket.emit('newLoc', {loc : [myGameArea.mouseXPoint, myGameArea.mouseYPoint], status : "Your turn"});
     }
     
     myGameArea.frame += 1;
@@ -425,7 +427,7 @@ class text {
             this.y = myGameArea.canvas.height / 2;  
         }
         else if(playerSetting.status == "Opponent's turn") {
-            this.x = myGameArea.canvas.width - 200;
+            this.x = myGameArea.canvas.width - 230;
             this.y = myGameArea.canvas.height / 2;
         }
         else if(playerSetting.status == "You won") {
@@ -434,6 +436,14 @@ class text {
         }
         else if(playerSetting.status == "You lose") {
             this.x = myGameArea.canvas.width - 175;
+            this.y = myGameArea.canvas.height / 2;
+        }
+        else if(playerSetting.status == "setting") {
+            this.x = myGameArea.canvas.width - 170;
+            this.y = myGameArea.canvas.height / 2;
+        }
+        else if(playerSetting.status == "wait for opponent") {
+            this.x = myGameArea.canvas.width - 237;
             this.y = myGameArea.canvas.height / 2;
         }
         var ctx = myGameArea.context;
@@ -488,10 +498,7 @@ function startGame() {
     for(var i = 0; i < 19; i++) {
         lines.push(new line(startX, startY + (30 * i), startX + (18 * 30), startY + (30 * i)))
     }
-    black.push(new blacks(1, 1));
-    white.push(new whites(5, 7));
-    playerSetting.status = "Your turn"; // 晚點刪掉
-    textAndBlocks.push(new block(myGameArea.canvas.width - 225, myGameArea.canvas.height / 2 - 75, 200, 150));
+    textAndBlocks.push(new block(myGameArea.canvas.width - 245, myGameArea.canvas.height / 2 - 75, 240, 150));
     textAndBlocks.push(new text());
 }
 </script>
